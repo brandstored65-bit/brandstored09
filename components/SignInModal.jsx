@@ -8,6 +8,8 @@ import axios from 'axios';
 
 const SignInModal = ({ open, onClose }) => {
   const [isRegister, setIsRegister] = useState(false);
+  // Country code state for phone auth
+  const [selectedCountryCode, setSelectedCountryCode] = useState('+91');
   const [usePhone, setUsePhone] = useState(true); // Default to phone login
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

@@ -16,12 +16,11 @@ import Truck from '../assets/delivery.png';
 import SignInModal from './SignInModal';
 
 const Navbar = () => {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => { setIsClient(true); }, []);
-  const router = useRouter();
-  const pathname = usePathname();
-  const isHomePage = pathname === '/';
-
+  // (already declared above)
+  // State for animated search placeholder
+  const [searchPlaceholder, setSearchPlaceholder] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [productIndex, setProductIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [supportDropdownOpen, setSupportDropdownOpen] = useState(false);
@@ -34,10 +33,20 @@ const Navbar = () => {
   const cartCount = useSelector((state) => state.cart.total);
   const [signInOpen, setSignInOpen] = useState(false);
   const [firebaseUser, setFirebaseUser] = useState(undefined);
-  const [searchPlaceholder, setSearchPlaceholder] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [productIndex, setProductIndex] = useState(0);
-  const [categories, setCategories] = useState([]);
+
+  // Show sign-in modal automatically on mobile for guest users
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024 && !firebaseUser) {
+      setSignInOpen(true);
+    }
+  }, [firebaseUser]);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
+  const router = useRouter();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+
+  // (already declared above)
 
   // Fetch categories from API
   useEffect(() => {
