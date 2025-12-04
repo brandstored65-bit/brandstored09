@@ -35,28 +35,23 @@ const SignInModal = ({ open, onClose }) => {
     return () => window.removeEventListener('openSignInModal', handleOpenModal);
   }, []);
 
-  // Setup RecaptchaVerifier
+  // Setup RecaptchaVerifier (robust, client-only, only once)
   useEffect(() => {
-    if (open && usePhone && !window.recaptchaVerifier) {
-      // Wait for the container to exist in the DOM
-      const interval = setInterval(() => {
-        const container = document.getElementById('recaptcha-container');
-        if (container && auth) {
-          try {
-            window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-              size: 'invisible',
-              callback: () => {
-                // reCAPTCHA solved
-              }
-            }, auth);
-          } catch (error) {
-            console.error('RecaptchaVerifier error:', error);
+    if (typeof window === 'undefined') return;
+    if (!open || !usePhone) return;
+    if (window.recaptchaVerifier) return;
+    const container = document.getElementById('recaptcha-container');
+    if (container && auth) {
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: () => {
+            // reCAPTCHA solved
           }
-          clearInterval(interval);
-        }
-      }, 100);
-      // Safety: clear interval after 2 seconds
-      setTimeout(() => clearInterval(interval), 2000);
+        }, auth);
+      } catch (error) {
+        console.error('RecaptchaVerifier error:', error);
+      }
     }
   }, [open, usePhone]);
 
