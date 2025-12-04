@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import OtpInput from './OtpInput';
 import { X, Truck, Undo2 } from 'lucide-react';
 import { auth, googleProvider } from '../lib/firebase';
-import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPhoneNumber } from 'firebase/auth';
 import Image from 'next/image';
 import GoogleIcon from '../assets/google.png';
 import axios from 'axios';
@@ -41,17 +41,34 @@ const SignInModal = ({ open, onClose }) => {
     if (!open || !usePhone) return;
     if (window.recaptchaVerifier) return;
     const container = document.getElementById('recaptcha-container');
-    if (container && auth) {
-      try {
-        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-          size: 'invisible',
-          callback: () => {
-            // reCAPTCHA solved
-          }
-        }, auth);
-      } catch (error) {
-        console.error('RecaptchaVerifier error:', error);
-      }
+    console.log('DEBUG Recaptcha:', { auth, container, open, usePhone });
+    if (!auth) {
+      setError('Authentication system is not initialized. Please contact support.');
+      console.error('RecaptchaVerifier error: auth is undefined');
+      return;
+    }
+    if (!container) {
+      setError('Recaptcha container not found. Please reload the page.');
+      console.error('RecaptchaVerifier error: container not found');
+      return;
+    }
+    // Use compat RecaptchaVerifier from window.firebase.auth
+    const RecaptchaVerifier = window.firebase && window.firebase.auth && window.firebase.auth.RecaptchaVerifier;
+    if (!RecaptchaVerifier) {
+      setError('RecaptchaVerifier (compat) is not available. Please reload the page.');
+      console.error('RecaptchaVerifier error: compat RecaptchaVerifier is not available');
+      return;
+    }
+    try {
+      window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved
+        }
+      }, auth);
+    } catch (error) {
+      setError('Failed to initialize Recaptcha. Please reload the page.');
+      console.error('RecaptchaVerifier error:', error);
     }
   }, [open, usePhone]);
 
@@ -75,17 +92,21 @@ const SignInModal = ({ open, onClose }) => {
     }
     setLoading(true);
     try {
-      // Recreate recaptcha if needed
+      // Always get RecaptchaVerifier from compat
+      const RecaptchaVerifier = window.firebase && window.firebase.auth && window.firebase.auth.RecaptchaVerifier;
       if (!window.recaptchaVerifier) {
+        if (!RecaptchaVerifier) {
+          setError('RecaptchaVerifier (compat) is not available. Please reload the page.');
+          setLoading(false);
+          return;
+        }
         window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
           size: 'invisible',
           callback: () => {}
         }, auth);
       }
-      
       const appVerifier = window.recaptchaVerifier;
       const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-      
       // Store confirmation result for later verification
       window.confirmationResult = confirmationResult;
       setOtpSent(true);
@@ -93,7 +114,6 @@ const SignInModal = ({ open, onClose }) => {
     } catch (err) {
       console.error('OTP send error:', err);
       let errorMessage = 'Failed to send OTP. Please try again.';
-      
       // Handle specific Firebase errors
       if (err.code === 'auth/quota-exceeded') {
         errorMessage = 'SMS quota exceeded. Please upgrade your Firebase plan or try email login.';
@@ -104,7 +124,6 @@ const SignInModal = ({ open, onClose }) => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
       setError(errorMessage);
       // Reset recaptcha
       if (window.recaptchaVerifier) {
