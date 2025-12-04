@@ -17,6 +17,8 @@ import SignInModal from './SignInModal';
 
 const Navbar = () => {
   // (already declared above)
+  // State for categories
+  const [categories, setCategories] = useState([]);
   // State for animated search placeholder
   const [searchPlaceholder, setSearchPlaceholder] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);

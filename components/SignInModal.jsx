@@ -47,8 +47,7 @@ const SignInModal = ({ open, onClose }) => {
               size: 'invisible',
               callback: () => {
                 // reCAPTCHA solved
-              },
-              'sitekey': '6LeCICEsAAAAAN4KV7qmPiVhzRtYKPx4_J4-zwEe' // Updated site key
+              }
             }, auth);
           } catch (error) {
             console.error('RecaptchaVerifier error:', error);
@@ -85,8 +84,7 @@ const SignInModal = ({ open, onClose }) => {
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
           size: 'invisible',
-          callback: () => {},
-          'sitekey': '6LeCICEsAAAAAN4KV7qmPiVhzRtYKPx4_J4-zwEe' // Updated site key
+          callback: () => {}
         }, auth);
       }
       
