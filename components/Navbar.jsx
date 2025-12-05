@@ -11,7 +11,7 @@ console.log("Firebase UID:", getAuth().currentUser?.uid);
 import Image from 'next/image';
 import axios from "axios";
 import toast from "react-hot-toast";
-import Logo from "../assets/logo/Asset 6.png";
+import Logo from "../assets/logo/White1@8x.png";
 import Truck from '../assets/delivery.png';
 import SignInModal from './SignInModal';
 
@@ -297,7 +297,7 @@ const Navbar = () => {
             
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              <Image src={Logo} alt="Qui Logo" width={140} height={40} className="object-contain" priority />
+              <Image src={Logo} alt="QuickFynd Logo" width={140} height={40} className="object-contain" priority />
             </Link>
           </div>
 
@@ -629,7 +629,7 @@ const Navbar = () => {
             >
               {/* Header with Logo and Close Button */}
               <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-                <Image src={require('../assets/logo/Asset 12.png')} alt="QuickFynd Logo" width={120} height={35} className="object-contain" />
+                <Image src={Logo} alt="QuickFynd Logo" width={120} height={35} className="object-contain" />
                 <button onClick={() => setMobileMenuOpen(false)} className="p-1 hover:bg-gray-100 rounded-full transition">
                   <X size={24} className="text-gray-600" />
                 </button>
