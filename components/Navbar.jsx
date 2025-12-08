@@ -253,15 +253,17 @@ const Navbar = () => {
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="flex-1">
-              <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
-                <Search size={16} className="text-gray-500 flex-shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Search for products"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-transparent outline-none placeholder-gray-500 text-gray-700 text-sm"
-                />
+              <div className="bg-red-600 p-1 rounded-xl">
+                <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full border border-transparent">
+                  <Search size={16} className="text-gray-500 flex-shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search for products"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full bg-transparent outline-none placeholder-gray-500 text-gray-700 text-sm"
+                  />
+                </div>
               </div>
             </form>
 
@@ -605,7 +607,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Search Bar - Below main navbar on mobile */}
-        <div className="lg:hidden pb-3" style={{ backgroundColor: '#2874f0' }}>
+        <div className="lg:hidden pb-3" style={{ backgroundColor: '#B91519' }}>
           <form onSubmit={handleSearch} className="flex items-center text-sm gap-2 bg-gray-100 mx-4 px-4 py-2.5 rounded-full border border-gray-200">
             <Search size={18} className="text-gray-500" />
             <input
