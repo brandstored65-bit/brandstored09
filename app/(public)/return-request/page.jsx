@@ -3,6 +3,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import axios from 'axios';
+import { getAuth } from "firebase/auth";
 import toast from 'react-hot-toast';
 import { Upload, X, RefreshCw, Undo2, StarIcon } from 'lucide-react';
 import Loading from '@/components/Loading';
@@ -13,10 +14,13 @@ function ReturnRequestForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const orderId = searchParams.get('orderId');
-    // TODO: Integrate Firebase Auth for user and token if needed
-    const getToken = async () => null;
+    // Integrate Firebase Auth for user and token
+    const user = getAuth().currentUser;
+    const getToken = async () => {
+        return user ? await user.getIdToken() : null;
+    };
     const isLoaded = true;
-    const isSignedIn = false;
+    const isSignedIn = !!user;
 
     const [loading, setLoading] = useState(true);
     const [order, setOrder] = useState(null);

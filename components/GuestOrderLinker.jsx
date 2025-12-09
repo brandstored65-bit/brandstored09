@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { getAuth } from "firebase/auth";
 import toast from 'react-hot-toast'
 // TODO: Import your Firebase Auth hooks/utilities here
 
@@ -14,9 +15,11 @@ export default function GuestOrderLinker() {
     // Example: const getToken = async () => user && user.getIdToken();
     const [checked, setChecked] = useState(false)
     // Placeholder logic for Firebase Auth
-    const user = null // TODO: Replace with actual user object
-    const isSignedIn = false // TODO: Replace with actual sign-in state
-    const getToken = async () => null // TODO: Replace with actual token retrieval
+    const user = getAuth().currentUser;
+    const isSignedIn = !!user;
+    const getToken = async () => {
+        return user ? await user.getIdToken() : null;
+    }
 
 
     useEffect(() => {
