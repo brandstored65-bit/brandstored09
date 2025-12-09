@@ -182,8 +182,28 @@ export async function GET(request) {
     try {
         await connectDB();
 
-        // ADMIN/GLOBAL: Return all products, no auth required
-        const products = await Product.find({}).sort({ createdAt: -1 }).lean();
+        // Firebase Auth: Extract token from Authorization header
+        const authHeader = request.headers.get('authorization');
+        let userId = null;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const idToken = authHeader.split('Bearer ')[1];
+            const { getAuth } = await import('firebase-admin/auth');
+            const { initializeApp, applicationDefault, getApps } = await import('firebase-admin/app');
+            if (getApps().length === 0) {
+                initializeApp({ credential: applicationDefault() });
+            }
+            try {
+                const decodedToken = await getAuth().verifyIdToken(idToken);
+                userId = decodedToken.uid;
+            } catch (e) {
+                // Not signed in, userId remains null
+            }
+        }
+        const storeId = await authSeller(userId);
+        if (!storeId) return NextResponse.json({ error: "Not authorized" }, { status: 401 });
+
+        // Only return products for this seller's store
+        const products = await Product.find({ storeId }).sort({ createdAt: -1 }).lean();
         return NextResponse.json({ products });
     } catch (error) {
         console.error(error);
