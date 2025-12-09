@@ -51,6 +51,7 @@ export default function ReviewForm({ productId, onReviewAdded }) {
             toast.error('Please write a review')
             return
         }
+        // Email is optional, do not validate
 
         try {
             setSubmitting(true)
@@ -58,6 +59,8 @@ export default function ReviewForm({ productId, onReviewAdded }) {
             formData.append('productId', productId)
             formData.append('rating', rating)
             formData.append('review', review)
+            // If you have an email field, only append if present
+            // if (email) formData.append('email', email)
             
             images.forEach(img => {
                 formData.append('images', img)

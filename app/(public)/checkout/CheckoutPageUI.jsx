@@ -152,13 +152,21 @@ export default function CheckoutPage() {
         return;
       }
       if (!user) {
-        if (!form.name || !form.email || !form.phone || !form.street || !form.city || !form.district) {
+        if (!form.name || !form.phone || !form.street || !form.city || !form.district) {
           setFormError("Please fill all required shipping details.");
           setPlacingOrder(false);
           return;
         }
+        // Email is NOT mandatory for guests
         if (!form.payment) {
           setFormError("Please select a payment method.");
+          setPlacingOrder(false);
+          return;
+        }
+      } else {
+        // For logged-in users, email is mandatory
+        if (!form.email) {
+          setFormError("Please enter your email address.");
           setPlacingOrder(false);
           return;
         }

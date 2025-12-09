@@ -241,7 +241,7 @@ const Navbar = () => {
     <>
       {/* Mobile-Only Simple Navbar for Non-Home Pages */}
       {!isHomePage && (
-        <nav className="lg:hidden sticky top-0 z-50 bg-gray-50 shadow-md">
+        <nav className="lg:hidden sticky top-0 z-50" style={{backgroundColor: '#B91519'}}>
           <div className="flex items-center gap-3 px-4 py-3">
             {/* Back Button */}
             <button 
@@ -281,7 +281,7 @@ const Navbar = () => {
       )}
 
       {/* Original Full Navbar (Hidden on mobile for non-home pages) */}
-      <nav className={`relative z-50 shadow-sm ${!isHomePage ? 'hidden lg:block' : ''}`} style={{ backgroundColor: '#B91519;', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+      <nav className={`relative z-50 shadow-sm ${!isHomePage ? 'hidden lg:block' : ''}`} style={{ backgroundColor: '#B91519', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between py-3 transition-all">
 

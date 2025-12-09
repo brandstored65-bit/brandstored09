@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { addToCart, uploadCart } from "@/lib/features/cart/cartSlice";
 import MobileProductActions from "./MobileProductActions";
+import ReviewForm from "./ReviewForm";
 import { useAuth } from '@/lib/useAuth';
 
 const ProductDetails = ({ product }) => {
@@ -475,6 +476,12 @@ const ProductDetails = ({ product }) => {
                 </>
               ) : (
                 <span className="text-xs text-gray-400 ml-1">No reviews</span>
+              )}
+            </div>
+            {/* Review Form */}
+            <div id="reviews" className="mt-6">
+              {product && (product._id || product.id) && (
+                <ReviewForm productId={product._id || product.id} />
               )}
             </div>
 
