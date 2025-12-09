@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +5,7 @@ import { useState, useEffect } from "react";
 import Counter from "@/components/Counter";
 import CartSummaryBox from "@/components/CartSummaryBox";
 import ProductCard from "@/components/ProductCard";
-import { deleteItemFromCart } from "@/lib/features/cart/cartSlice";
+import { deleteItemFromCart, rehydrateCart } from "@/lib/features/cart/cartSlice";
 import { PackageIcon, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { fetchShippingSettings, calculateShipping } from '@/lib/shipping';
@@ -103,6 +102,10 @@ export default function Cart() {
             setLoadingOrders(false);
         }
     }
+
+    useEffect(() => {
+        dispatch(rehydrateCart());
+    }, [dispatch]);
 
     useEffect(() => {
         if (products.length > 0) {

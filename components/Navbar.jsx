@@ -241,7 +241,7 @@ const Navbar = () => {
     <>
       {/* Mobile-Only Simple Navbar for Non-Home Pages */}
       {!isHomePage && (
-        <nav className="lg:hidden sticky top-0 z-50 bg-white shadow-sm">
+        <nav className="lg:hidden sticky top-0 z-50 bg-gray-50 shadow-md">
           <div className="flex items-center gap-3 px-4 py-3">
             {/* Back Button */}
             <button 
@@ -253,7 +253,7 @@ const Navbar = () => {
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="flex-1">
-              <div className="bg-red-600 p-1 rounded-xl">
+              <div className="p-1">
                 <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full border border-transparent">
                   <Search size={16} className="text-gray-500 flex-shrink-0" />
                   <input

@@ -22,7 +22,7 @@ const Footer = () => {
                 { text: "Categories", path: '/categories', icon: null },
             ]
         },
-        {
+        { 
             title: "CUSTOMER CARE",
             links: [
                 { text: "Track Order", path: '/track-order', icon: null },
@@ -44,7 +44,7 @@ const Footer = () => {
             ]
         },
         {
-            title: "ABOUT QUI",
+            title: "ABOUT US",
             links: [
                 { text: "About Us", path: '/support', icon: null },
                 { text: "Create Your Store", path: '/create-store', icon: null },
@@ -89,7 +89,7 @@ const Footer = () => {
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                                 <MapPinIcon />
-                                <span className="text-slate-400">kerala</span>
+                                <span className="text-slate-400">Dubai, UAE</span>
                             </div>
                         </div>
                         {/* Social Icons removed from brand section to avoid duplication */}

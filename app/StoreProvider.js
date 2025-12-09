@@ -13,22 +13,6 @@ export default function StoreProvider({ children }) {
 
   // Rehydrate cart from localStorage on mount
   React.useEffect(() => {
-    // Clear old cart data that might have invalid product IDs
-    const cartState = localStorage.getItem('cartState');
-    if (cartState) {
-      try {
-        const parsed = JSON.parse(cartState);
-        // Check if cart has any items
-        if (parsed.cartItems && Object.keys(parsed.cartItems).length > 0) {
-          console.log('Existing cart found. Clearing old cart data to prevent ID mismatch...');
-          // Clear the cart to avoid old product.id vs new product._id mismatch
-          localStorage.setItem('cartState', JSON.stringify({ total: 0, cartItems: {} }));
-        }
-      } catch (e) {
-        console.error('Error parsing cart state:', e);
-      }
-    }
-    
     storeRef.current.dispatch({ type: 'cart/rehydrateCart' });
   }, []);
 

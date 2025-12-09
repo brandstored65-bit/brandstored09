@@ -229,7 +229,7 @@ export default function ProductForm({ product = null, onClose, onSubmitSuccess }
 
     const onChangeHandler = (e) => {
         const { name, value } = e.target
-        
+
         // Auto-generate slug from product name
         if (name === 'name') {
             const slug = value
@@ -239,12 +239,22 @@ export default function ProductForm({ product = null, onClose, onSubmitSuccess }
                 .replace(/\s+/g, '-') // Replace spaces with hyphens
                 .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
                 .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-            
-            setProductInfo(prev => ({ 
-                ...prev, 
+
+            setProductInfo(prev => ({
+                ...prev,
                 [name]: value,
-                slug: slug 
+                slug: slug
             }))
+        } else if (name === 'slug') {
+            // Clean up slug input if user edits manually
+            const cleanedSlug = value
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            setProductInfo(prev => ({ ...prev, slug: cleanedSlug }))
         } else {
             setProductInfo(prev => ({ ...prev, [name]: value }))
         }
@@ -411,13 +421,13 @@ export default function ProductForm({ product = null, onClose, onSubmitSuccess }
                         <input name="name" value={productInfo.name} onChange={onChangeHandler} className="w-full border rounded px-3 py-2" placeholder="Enter product name" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Product Slug <span className="text-xs text-green-600">(auto-generated from name)</span></label>
+                        <label className="block text-sm font-medium mb-1">Product Slug <span className="text-xs text-green-600">(auto or manually set)</span></label>
                         <input 
                             name="slug" 
                             value={productInfo.slug} 
-                            readOnly 
-                            className="w-full border rounded px-3 py-2 bg-gray-50 text-gray-600 cursor-not-allowed" 
-                            placeholder="Auto-generated from product name" 
+                            onChange={onChangeHandler}
+                            className="w-full border rounded px-3 py-2" 
+                            placeholder="Auto-generated or enter custom slug" 
                         />
                     </div>
                     <div>

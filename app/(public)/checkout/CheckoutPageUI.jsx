@@ -152,7 +152,7 @@ export default function CheckoutPage() {
         return;
       }
       if (!user) {
-        if (!form.name || !form.email || !form.phone || !form.street || !form.city || !form.state || !form.country) {
+        if (!form.name || !form.email || !form.phone || !form.street || !form.city || !form.district) {
           setFormError("Please fill all required shipping details.");
           setPlacingOrder(false);
           return;
@@ -201,14 +201,10 @@ export default function CheckoutPage() {
             name: form.name,
             email: form.email,
             phone: form.phone,
-            address: form.street,
-            street: form.street,
             city: form.city,
-            state: form.state,
-            country: form.country || 'India',
-            pincode: form.pincode || '',
-            district: form.district || '',
-            zip: form.pincode || '000000',
+            district: form.district,
+            street: form.street,
+            note: form.note,
           },
           items: cartArray.map(({ _id, quantity }) => ({ id: _id, quantity })),
           paymentMethod: form.payment === 'cod' ? 'COD' : form.payment.toUpperCase(),
@@ -251,14 +247,24 @@ export default function CheckoutPage() {
         return;
       }
       const data = await res.json();
-      dispatch(clearCart());
-      router.push(`/order-success?orderId=${data._id || data.id}`);
+      // Show loader until order is confirmed
+      setPlacingOrder(true);
+      setTimeout(() => {
+        dispatch(clearCart());
+        router.push(`/order-success?orderId=${data._id || data.id}`);
+        setPlacingOrder(false);
+      }, 1200); // 1.2s loader for better UX
     } catch (err) {
       setFormError(err.message || "Order failed. Please try again.");
     } finally {
       setPlacingOrder(false);
     }
   };
+
+  // Set default payment method to COD on mount
+  useEffect(() => {
+    setForm((f) => ({ ...f, payment: f.payment || 'cod' }));
+  }, []);
 
   if (authLoading) return null;
   
@@ -394,7 +400,8 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3 mb-4">
-                  {/* ...existing code for guest/inline address form... */}
+                                    {/* Hidden country field, default UAE */}
+                                    <input type="hidden" name="country" value={form.country || 'UAE'} />
                   {/* Name */}
                   <input
                     className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
@@ -405,7 +412,16 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     required
                   />
-                  {/* Phone input */}
+                  {/* Email (optional) */}
+                  <input
+                    className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
+                    type="email"
+                    name="email"
+                    placeholder="Email address (optional)"
+                    value={form.email || ''}
+                    onChange={handleChange}
+                  />
+                  {/* Phone input with country code selector */}
                   <div className="flex gap-2">
                     <select
                       className="border border-gray-200 bg-white rounded px-2 py-2 focus:border-gray-400"
@@ -429,25 +445,6 @@ export default function CheckoutPage() {
                       required
                     />
                   </div>
-                  {/* Email (optional) */}
-                  <input
-                    className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
-                    type="email"
-                    name="email"
-                    placeholder="Email address (optional)"
-                    value={form.email || ''}
-                    onChange={handleChange}
-                  />
-                  {/* Pincode */}
-                  <input
-                    className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
-                    type="text"
-                    name="pincode"
-                    placeholder="Pincode"
-                    value={form.pincode || ''}
-                    onChange={handleChange}
-                    required={form.country === 'India'}
-                  />
                   {/* City */}
                   <input
                     className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
@@ -458,77 +455,56 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     required
                   />
-                  {/* District dropdown (for India) */}
-                  {form.country === 'India' && (
-                    <select
-                      className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
-                      name="district"
-                      value={form.district}
-                      onChange={handleChange}
-                      required={!!form.state}
-                      disabled={!form.state}
-                    >
-                      <option value="">Select District</option>
-                      {districts.map((d) => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  )}
-                  {/* Full Address Line (street) */}
+                  {/* Area/District */}
+                  <input
+                    className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
+                    type="text"
+                    name="district"
+                    placeholder="Area / District"
+                    value={form.district || ''}
+                    onChange={handleChange}
+                    required
+                  />
+                  {/* Street name, building, apartment */}
                   <input
                     className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
                     type="text"
                     name="street"
-                    placeholder="Full Address Line (Street, Building, Apartment)"
+                    placeholder="Street name, building number, apartment number"
                     value={form.street || ''}
                     onChange={handleChange}
                     required
                   />
-                  {/* State dropdown (all states, default Kerala) */}
-                  <select
+                  {/* Add a note */}
+                  <input
                     className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
-                    name="state"
-                    value={form.state}
+                    type="text"
+                    name="note"
+                    placeholder="Add a note"
+                    value={form.note || ''}
                     onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select State</option>
-                    {indiaStatesAndDistricts.map((s) => (
-                      <option key={s.state} value={s.state}>{s.state}</option>
-                    ))}
-                  </select>
-                  {/* Country dropdown (default India) */}
-                  <select
-                    className="border border-gray-200 bg-white rounded px-4 py-2 focus:border-gray-400"
-                    name="country"
-                    value={form.country}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="India">India</option>
-                    {countryCodes.filter(c => c.label !== 'India').map((c) => (
-                      <option key={c.label} value={c.label.replace(/ \(.*\)/, '')}>{c.label.replace(/ \(.*\)/, '')}</option>
-                    ))}
-                  </select>
+                  />
                 </div>
               )}
               <h2 className="text-xl font-bold mb-2 text-gray-900">Payment methods</h2>
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="cod"
-                    checked={form.payment === 'cod'}
-                    onChange={handleChange}
-                    className="accent-red-600 w-5 h-5"
-                  />
-                  <span className="font-semibold text-red-600 flex items-center gap-2">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4"/><path d="M10 10v4"/><path d="M14 10v4"/><path d="M18 10v4"/></svg>
-                    Cash on Delivery
-                  </span>
-                </label>
-                <div className="ml-8 mt-2 text-gray-600 text-sm">Cash on Delivery</div>
+                <div className="flex flex-col gap-0">
+                  <label className={`flex items-center gap-3 cursor-pointer px-4 py-3 rounded-lg border ${form.payment === 'cod' ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white'}`}>
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="cod"
+                      checked={form.payment === 'cod'}
+                      onChange={handleChange}
+                      className={`accent-red-600 w-5 h-5 ${form.payment === 'cod' ? 'ring-2 ring-red-500' : ''}`}
+                    />
+                    <span className={`font-semibold flex items-center gap-2 ${form.payment === 'cod' ? 'text-red-600' : 'text-gray-900'}`}>
+                      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="${form.payment === 'cod' ? 'text-red-600' : 'text-gray-400'}"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4"/><path d="M10 10v4"/><path d="M14 10v4"/><path d="M18 10v4"/></svg>
+                      Cash on Delivery
+                    </span>
+                  </label>
+                  <div className="pl-12 pt-2 pb-1 text-gray-600 text-sm">Cash on Delivery</div>
+                </div>
               </div>
             </form>
           </div>
@@ -566,14 +542,17 @@ export default function CheckoutPage() {
             <span>Total</span>
             <span>AED {total.toLocaleString()}</span>
           </div>
-          <button
-            type="submit"
-            form="checkout-form"
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded text-lg transition"
-            disabled={placingOrder}
-          >
-            {placingOrder ? "Placing order..." : "Place order"}
-          </button>
+          <div className="md:static md:mb-0 fixed bottom-16 left-0 right-0 z-50" style={{maxWidth: '100vw'}}>
+            <button
+              type="submit"
+              form="checkout-form"
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-4 text-xl transition shadow-2xl md:w-full md:rounded md:text-lg"
+              style={{borderRadius: '0', boxShadow: '0 -2px 16px rgba(0,0,0,0.10)', marginBottom: '4px', letterSpacing: '0.5px'}}
+              disabled={placingOrder}
+            >
+              {placingOrder ? "Placing order..." : "Place order"}
+            </button>
+          </div>
         </div>
       </div>
       <AddressModal open={showAddressModal} setShowAddressModal={setShowAddressModal} onAddressAdded={(addr) => {
