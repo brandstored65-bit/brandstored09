@@ -36,19 +36,28 @@ export default function Dashboard() {
     ]
 
     useEffect(() => {
-        const fetchDashboard = async () => {
+        const fetchDashboard = async (refreshToken = false) => {
             if (!user) {
                 setLoading(false);
                 return;
             }
 
             try {
-                const token = await getToken();
+                const token = await getToken(refreshToken);
                 const { data } = await axios.get('/api/store/dashboard', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setDashboardData(data.dashboardData);
             } catch (error) {
+                // If unauthorized, try refreshing token once
+                if (!refreshToken && error?.response?.status === 401) {
+                    try {
+                        await fetchDashboard(true);
+                        return;
+                    } catch (retryError) {
+                        console.error('Dashboard retry error:', retryError);
+                    }
+                }
                 console.error('Dashboard fetch error:', error);
                 toast.error(error?.response?.data?.error || 'Failed to load dashboard');
             } finally {
